@@ -1,0 +1,52 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  name    String
+  email   String   @unique
+  reviews Review[]
+  author  Author?
+
+  @@map("users")
+}
+
+model Author {
+  id      Int      @id @default(autoincrement())
+  userId  Int      @unique
+  user    User     @relation(fields: [userId], references: [id])
+  books   Book[]
+  reviews Review[]
+
+  @@map("authors")
+}
+
+model Book {
+  id       Int      @id @default(autoincrement())
+  title    String
+  authorId Int
+  author   Author   @relation(fields: [authorId], references: [id])
+  reviews  Review[]
+
+  @@map("books")
+}
+
+model Review {
+  id       Int     @id @default(autoincrement())
+  content  String
+  rating   Int
+  bookId   Int
+  userId   Int
+  authorId Int?
+  book     Book    @relation(fields: [bookId], references: [id])
+  user     User    @relation(fields: [userId], references: [id])
+  author   Author? @relation(fields: [authorId], references: [id])
+
+  @@map("reviews")
+}
